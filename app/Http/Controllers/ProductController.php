@@ -46,7 +46,7 @@ class ProductController extends Controller
 
         $validated['category_id'] = $request->category;
 
-        if($request->hasFile('product_image')){
+        if ($request->hasFile('product_image')) {
             $filenameWithExtensions = $request->file('product_image')->getClientOriginalName();
             $filename = pathinfo($filenameWithExtensions, PATHINFO_FILENAME);
             $extensions = $request->file('product_image')->getClientOriginalExtension();
@@ -57,7 +57,7 @@ class ProductController extends Controller
 
         $product = Products::create($validated);
 
-        if(!$product) {
+        if (!$product) {
             return redirect()->route('product.create')->with([
                 'message' => 'Unable to add product!',
                 'type' => 'error'
@@ -87,7 +87,6 @@ class ProductController extends Controller
         $categories = Categories::where('is_deleted', false)->get();
 
         return view('product_form', compact('product', 'categories'));
-        
     }
 
     /**
@@ -108,7 +107,7 @@ class ProductController extends Controller
 
         $validated['category_id'] = $request->category;
 
-        if($request->hasFile('product_image')){
+        if ($request->hasFile('product_image')) {
             $filenameWithExtensions = $request->file('product_image')->getClientOriginalName();
             $filename = pathinfo($filenameWithExtensions, PATHINFO_FILENAME);
             $extensions = $request->file('product_image')->getClientOriginalExtension();
@@ -117,7 +116,7 @@ class ProductController extends Controller
             $validated['product_image'] = $filenameToStore;
         }
 
-        if($product->update($validated)) {
+        if ($product->update($validated)) {
             return redirect()->route('products')->with([
                 'message' => 'Task updated successfully!',
                 'type' => 'success'
@@ -146,27 +145,26 @@ class ProductController extends Controller
             'type' => 'success'
         ]);
     }
-   public function addComment(Request $request, $id)
-   {
+    public function addComment(Request $request, $id)
+    {
 
-    $request->validate([
-        'comment' => 'required|string|max:255',
-    ]);
+        $request->validate([
+            'comment' => 'required|string|max:255',
+        ]);
 
 
-    $comment = Comment::create([
-        'product_id' => $id,
-        'user_id' => Auth::user()->id,
-        'comment' => $request->comment,
+        $comment = Comment::create([
+            'product_id' => $id,
+            'user_id' => Auth::user()->id,
+            'comment' => $request->comment,
 
-    ]);
+        ]);
 
-    if($comment) {
-        return redirect()->back()->with('success', 'Comment added successfully!');
+        if ($comment) {
+            return redirect()->back()->with('success', 'Comment added successfully!');
+        }
+
+
+        return redirect()->back()->with('error', 'Unable to comment!');
     }
-
-
-    return redirect()->back()->with('error', 'Unable to comment!');
-
-   }
 }

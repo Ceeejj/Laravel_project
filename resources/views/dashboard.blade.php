@@ -1,156 +1,107 @@
-<x-app-layout>
-    <div class="flex flex-col w-full h-screen bg-gray-800 text-white">
-        <div class="flex items-center justify-between h-16 border-b border-gray-700 px-4">
-            <h1 class="text-lg font-bold">Tasks</h1>
-            <button 
-                id="addTaskButton" 
-                class="btn btn-primary bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Add Task
-            </button>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
 
-        <div class="flex h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
-        <nav class="w-1/4 bg-gray-900 p-4 border-r border-gray-700">
-                <ul>
-                    <li class="mb-4">
-                        <a href="#" class="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded">
-                            <span>My Tasks</span>
-                        </a>
-                    </li>
-                    <hr class="border-gray-700 mb-4">
 
-                    <li class="mb-4">
-                        <a href="#" class="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded">
-                            <span>Team Tasks</span>
-                        </a>
-                    </li>
-                    <hr class="border-gray-700 mb-4">
+    <div class="feedback-container">
+        <h2 class="text-center mb-4"> We Value Your Feedback</h2>
 
-                    <li>
-                        <a href="#" class="flex items-center p-2 text-gray-300 hover:bg-gray-700 hover:text-white rounded">
-                            <span>Progress</span>
-                        </a>
-                    </li>
-                    <hr class="border-gray-700 mt-4">
-                </ul>
-            </nav>
+        <form id="feedbackForm" action="/feedback" method="POST">
 
-            <!-- Main Content -->
-            <div class="w-3/4 p-6">
-                <table class="w-full border border-gray-300 border-collapse">
-                    <thead>
-                        <tr class="bg-gray-700 text-white uppercase text-sm text-center">
-                            <th class="py-3 px-6 border border-gray-300">Image</th>
-                            <th class="py-3 px-6 border border-gray-300">Task</th>
-                            <th class="py-3 px-6 border border-gray-300">Task Description</th>
-                            <th class="py-3 px-6 border border-gray-300">Assigned To</th>
-                            <th class="py-3 px-6 border border-gray-300">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($tasks as $task)
-                        <tr class="bg-gray-800 border-b border-gray-700 text-center">
-                            <td class="py-3 px-6 border border-gray-300">
-                                <img src="{{ $task->image ? asset('storage/' . $task->image) : 'https://via.placeholder.com/40' }}" class="w-10 h-10 rounded-full" alt="Task Image">
-                            </td>
-                            <td class="py-3 px-6 border border-gray-300">{{ $task->task_title }}</td>
-                            <td class="py-3 px-6 border border-gray-300">{{ $task->task_description }}</td>
-                            <td class="py-3 px-6 border border-gray-300">{{ $task->assignedTo->name ?? 'Not Assigned' }}</td>
-                            <td class="py-3 px-6 border border-gray-300">
-                                <a href="{{ route('tasks.edit', $task->id) }}" class="text-blue-500 hover:text-blue-700 font-bold mr-2">Edit</a>
-                                <form method="POST" action="{{ route('tasks.delete', $task->id) }}" class="inline-block">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button 
-                                        type="submit" 
-                                        class="text-red-500 hover:text-red-700 font-bold"
-                                        onclick="return confirm('Are you sure you want to delete this task?');">
-                                        Delete
-                                    </button>
-                                </form>
-                                <a href="#" class="text-green-500 hover:text-green-700 font-bold ml-2">Update</a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+
+            @csrf
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
             </div>
-        </div>
-    </div>
 
-    <!-- Task Form Modal -->
-    <div 
-        id="taskFormModal" 
-        class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center hidden">
-        <div class="task-form-container bg-white rounded-lg shadow-lg p-8 w-full max-w-lg">
-            <div class="form-header flex justify-between items-center mb-4">
-                <h2 class="text-lg font-bold text-gray-800">Add New Task</h2>
-                <button 
-                    id="closeModalButton" 
-                    class="text-gray-500 hover:text-gray-800 font-bold text-lg">&times;</button>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="email" name="email" required>
             </div>
-            <form action="{{ route('tasks.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="form-group mb-4">
-                    <label for="image" class="block font-bold text-gray-700 mb-2">Image</label>
-                    <input type="file" class="form-control" id="image" name="image" required>
-                </div>
 
-                <div class="form-group mb-4">
-                    <label for="title" class="block font-bold text-gray-700 mb-2">Title</label>
-                    <input type="text" class="form-control w-full py-2" id="title" name="title" required>
-                </div>
+            <div class="mb-3">
+                <label for="message" class="form-label">Your Message</label>
+                <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+            </div>
 
-                <div class="form-group mb-4">
-                    <label for="description" class="block font-bold text-gray-700 mb-2">Description</label>
-                    <textarea class="form-control w-full py-2" id="description" name="description" rows="3" required></textarea>
-                </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-custom" id="submitButton">
+                    <span id="buttonText">Submit Feedback</span>
+                    <span id="spinner" class="spinner-border spinner-border-sm d-none ms-2" role="status"
+                        aria-hidden="true"></span>
+                </button>
+            </div>
 
-                <div class="form-group mb-4">
-                    <label for="date" class="block font-bold text-gray-700 mb-2">Date</label>
-                    <input type="date" class="form-control w-full py-2" id="date" name="date" required>
-                </div>
-
-                <div class="form-group mb-4">
-                    <label for="task_type" class="block font-bold text-gray-700 mb-2">Task Type</label>
-                    <select class="form-control w-full py-2" id="task_type" name="task_type" required>
-                        <option value="">Select Task Type</option>
-                        <option value="personal">My Task</option>
-                        <option value="collaborative">Collaborative Task</option>
-                        <option value="team">Team Task</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Save Task
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div id="responseMessage" class="alert mt-3 d-none"></div>
+        </form>
     </div>
-
 
     <script>
-        const addTaskButton = document.getElementById('addTaskButton');
-        const taskFormModal = document.getElementById('taskFormModal');
-        const closeModalButton = document.getElementById('closeModalButton');
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('feedbackForm');
+            const submitButton = document.getElementById('submitButton');
+            const buttonText = document.getElementById('buttonText');
+            const spinner = document.getElementById('spinner');
+            const responseMessage = document.getElementById('responseMessage');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
 
-        addTaskButton.addEventListener('click', () => {
-            taskFormModal.classList.remove('hidden');
-        });
+                submitButton.disabled = true;
+                buttonText.textContent = 'Processing...';
+                spinner.classList.remove('d-none');
+                responseMessage.classList.add('d-none');
 
+                const formData = new FormData(form);
 
-        closeModalButton.addEventListener('click', () => {
-            taskFormModal.classList.add('hidden');
-        });
+                try {
+                    const response = await fetch('/feedback', {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: formData
+                    });
 
-        window.addEventListener('click', (e) => {
-            if (e.target === taskFormModal) {
-                taskFormModal.classList.add('hidden');
-            }
+                    const data = await response.json();
+
+                    responseMessage.classList.remove('d-none');
+                    if (response.ok && data.success) {
+                        responseMessage.className = 'alert alert-success mt-3';
+                        responseMessage.innerHTML =
+                            `<strong>Success!</strong> ${data.message}<div class="mt-2">We've sent a confirmation to ${formData.get('email')}.</div>`;
+                        form.reset();
+                    } else {
+                        throw new Error(data.message || 'Failed to submit feedback');
+                    }
+                } catch (error) {
+                    responseMessage.className = 'alert alert-danger mt-3';
+                    responseMessage.textContent = `Error: ${error.message}`;
+                    console.error('Submission error:', error);
+                } finally {
+                    submitButton.disabled = false;
+                    buttonText.textContent = 'Submit Feedback';
+                    spinner.classList.add('d-none');
+
+                    setTimeout(() => {
+                        responseMessage.classList.add('d-none');
+                    }, 5000);
+                }
+            });
         });
     </script>
-</x-app-layout>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+
+</html>

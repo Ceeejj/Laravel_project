@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
@@ -11,7 +12,9 @@ Route::get('/', function () {
 });
 
 ############
-Route::prefix('Admin')->middleware(['auth', 'verified'])->group(function() {
+Route::prefix('Admin')->middleware(['auth', 'verified'])->group(function () {
+
+    Route::get('/', [TaskController::class, 'index'])->name('dashboard');
 
     Route::get('Users', [UserController::class, 'index'])->name('users');
     Route::get('User/New', [UserController::class, 'create'])->name('user.create');
@@ -25,15 +28,8 @@ Route::prefix('Admin')->middleware(['auth', 'verified'])->group(function() {
     Route::post('Products/Create/New/Store', [ProductController::class, 'store'])->name('product.store');
     Route::get('Products/Edit/{product_id}', [ProductController::class, 'edit'])->name('product.edit');
     Route::put('Products/Edit/{product_id}/Update}', [ProductController::class, 'update'])->name('product.update');
-    Route::post('Admin/Products/{product_id}/comment',[ProductController::class, 'addComment'])->name('product.comment');
+    Route::post('Admin/Products/{product_id}/comment', [ProductController::class, 'addComment'])->name('product.comment');
     Route::delete('Products/Delete/{product_id}', [ProductController::class, 'destroy'])->name('product.delete');
-
-    Route::get('Tasks', [TaskController::class, 'index'])->name('dashboard');
-    Route::post('Tasks/Create/New/Store', [TaskController::class, 'store'])->name('tasks.store');
-    Route::get('Tasks/{id}/Edit', [TaskController::class, 'edit'])->name('tasks.edit');
-    Route::put('Tasks/{id}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::delete('Tasks/{id}', [TaskController::class, 'destroy'])->name('tasks.destroy');
-    
 });
 
 
@@ -42,5 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+Route::post('/feedback', [FeedbackController::class, 'store']);
 
-require __DIR__.'/auth.php';
+
+require __DIR__ . '/auth.php';
